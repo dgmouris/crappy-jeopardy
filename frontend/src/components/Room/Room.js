@@ -16,6 +16,8 @@ const Room = (props) => {
     }, [props.userId, props.roomId]);
 
     const [currentQuestionText, setCurrentQuestionText] = useState("what is the capital of alberta?")
+    const [currentAnswerText, setAnswerQuestionText] = useState("edmonton")
+
     const [users, setUsers] = useState([]);
     const [userAnswers, setUserAnswers] = useState([]);
 
@@ -43,19 +45,28 @@ const Room = (props) => {
       if (roomId == "") {
         return
       }
+      resetRoomQuestion()
       let questionUrl = `${BASE_URL}/room/${roomId}/questions/${props.currentQuestionId}`
       axios.get(questionUrl)
       .then(res => {
         let questionName = res.data.name
         setCurrentQuestionText(questionName)
       })
+
     }, [roomId, props.currentQuestionId])
 
+    const resetRoomQuestion = () => {
+      setUserAnswers([])
+      setAnswer("")
+      setFinalAnswer("")
+    }
 
     useEffect(()=> {
+      if (finalAnswer === ""){
+        return
+      }
       props.sendAnswerToServer(props.currentQuestionId, finalAnswer)
-    }, [finalAnswer])
-
+    }, [finalAnswer]);
 
     // sort through the answers for the given question.
     useEffect(()=> {
@@ -71,8 +82,8 @@ const Room = (props) => {
           'name': user,
           ...userAnswer
         }
-      }).sort((a, b) => {
-        return a.time - b.time;
+      }).sort((answer_a, answer_b) => {
+        return answer_a.time - answer_b.time;
       })
       console.log(allCurrentAnswersData)
       setUserAnswers(allCurrentAnswersData)
@@ -82,11 +93,19 @@ const Room = (props) => {
       setAnswer(event.target.value)
     }
 
+    const nextQuestionHandler = (event) => {
+      props.sendGetNewQuestion()
+    }
+
     const isNotEmptyFinalAnswer = () => {
       return finalAnswer !== ""
     }
     const isNotEmptyAnswer = () => {
       return answer !== ""
+    }
+
+    const isFirstToAnswer = ()=> {
+      return userId === props.firstToAnswer;
     }
 
     return <div className="room-page">
@@ -100,7 +119,24 @@ const Room = (props) => {
           <p className="text-center mb-4">Question</p>
           <p className="h4 text-center mb-4">{currentQuestionText}</p>
           <div className="text-center mt-4">
-            <MDBBtn color="green" onClick={answerHandler}>I know the Answer!</MDBBtn>
+            <MDBBtn color="green" onClick={answerHandler} disabled={finalAnswer!==""}>I know the Answer!</MDBBtn>
+          </div>
+          <div className="text-center mt-4">
+            <MDBBtn color="light-blue"
+              onClick={nextQuestionHandler}
+              disabled={!isFirstToAnswer()}
+              >Next Question</MDBBtn>
+            {isFirstToAnswer() ?
+              <p>Click for next quesiton!</p>
+              :
+              <React.Fragment>
+              { props.firstToAnswer !== undefined ?
+                <p>Waiting on {props.firstToAnswer} for new quesiton</p>
+                :
+                <p>Waiting on user answers...</p>
+              }
+              </React.Fragment>
+            }
           </div>
           <br/>
           <br/>

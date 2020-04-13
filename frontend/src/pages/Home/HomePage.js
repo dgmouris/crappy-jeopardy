@@ -32,7 +32,6 @@ const HomePage = (props) => {
           setErrors("error with the request.")
         }
       });
-    // history.push(`/room/${roomN1ame}/user/${userRoomName}`);
   }
 
   const userNameChangeHandler = (event) => {

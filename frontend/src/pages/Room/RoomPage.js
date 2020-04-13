@@ -2,15 +2,20 @@ import React, {useRef, useEffect, useState, useCallback} from 'react';
 import { useParams } from "react-router-dom";
 import axios from 'axios';
 import Room from '../../components/Room/Room.js';
-import {BASE_URL} from "../../settings.js";
+import {BASE_URL, WS_BASE_URL} from "../../settings.js";
 import { browserHistory } from 'react-router';
 
 const USER_JOIN_ACTION = "user_join";
 const ANSWER_QUESTION_ACTION = "answer_question";
+const NEW_QUESTION_ACTION = "new_question";
+const FIRST_TO_ANSWER_ACTION = "first_to_answer";
 
 const RoomPage = (props) => {
     const ws = useRef(null);
     const [roomUserData, setRoomUserData] = useState({})
+    const [currentQuestionId, setCurrentQuestionId] = useState(144)
+    const [newQuestionId, setNewQuestionId] = useState(144)
+    const [firstToAnswer, setFirstToAnswer] = useState()
     const [messages, setMessages] = useState([])
     const addNewMessage = useCallback(() => {
         setMessages([...messages])
@@ -22,20 +27,19 @@ const RoomPage = (props) => {
 
     useEffect(() => {
         openAndListenToWebSocket();
-        handleUserJoin()
+        setInitialRoomData();
         return () => {
             closeWebSocket()
         };
     }, []);
 
     const openAndListenToWebSocket = () => {
-      ws.current = new WebSocket(`ws://127.0.0.1:8000/ws/questions_notifications/${roomId}/`);
+      ws.current = new WebSocket(`${WS_BASE_URL}/questions_notifications/${roomId}/`);
       ws.current.onopen = () => {
           ws.current.send(JSON.stringify({
               'type': USER_JOIN_ACTION,
               'user': userId,
               'message': "Joined Room",
-              'action': "user_join"
           }));
       };
       ws.current.onclose = () => console.log("ws closed");
@@ -56,8 +60,15 @@ const RoomPage = (props) => {
       ws.current.close();
     }
 
+    const cannotSendWebsocketMessage = () => {
+      if (roomUserData === {}) {
+        return false;
+      }
+      return (!ws.current || userId === "");
+    }
+
     const sendAnswer = (question, answer) => {
-      if (!ws.current || userId === "" ){
+      if (cannotSendWebsocketMessage()){
         return
       }
       ws.current.send(JSON.stringify({
@@ -66,21 +77,36 @@ const RoomPage = (props) => {
           'message': {
             'question': question,
             'answer': answer,
-          },
-          'action': ANSWER_QUESTION_ACTION
+          }
       }));
     }
 
+    const sendGetNewQuestion = (question) => {
+      if (cannotSendWebsocketMessage()){
+        return
+      }
+      if (roomUserData === {}) {
+        return
+      }
+      setFirstToAnswer()
+      ws.current.send(JSON.stringify({
+          'type': NEW_QUESTION_ACTION,
+          'user': userId,
+          'message': {
+            'new_question': question
+          }
+      }));
+    }
 
+    // handle the last message
     useEffect(()=> {
-      // console.log("Message Handler");
-      // console.log(messages)
       let lastMessage = messages[messages.length - 1];
       handleLastMessageUpdate(lastMessage)
     }, [messages])
 
+    // debug purposes
     useEffect(()=> {
-
+      console.log("roomUserData")
       console.log(roomUserData)
     }, [roomUserData])
 
@@ -89,14 +115,16 @@ const RoomPage = (props) => {
         return
       }
       console.log("handleLastMessageUpdate");
-      // console.log(payload)
+      console.log(payload)
       switch(payload.action) {
         case USER_JOIN_ACTION:
-          handleUserJoin(payload.message.users)
+          handleUserJoin(payload)
           break;
         case ANSWER_QUESTION_ACTION:
-          handleUserAnswerQuestion(payload)
-
+          handleUserAnswerQuestion(payload);
+          break;
+        case NEW_QUESTION_ACTION:
+          handleNewQuestion(payload);
           break;
         default:
           console.log("unhandled message")
@@ -107,36 +135,43 @@ const RoomPage = (props) => {
       const user = payload.user
       const answerMessage = payload.message
       const questionId = payload.message.question
-      console.log(ANSWER_QUESTION_ACTION)
-      console.log(payload)
+
+      setFirstToAnswer(payload.message.first_to_answer)
+      setNewQuestionId(payload.message.next_question)
+
       let currentRoomUserData = {...roomUserData}
       Object.keys(currentRoomUserData).forEach((user, i)=> {
-          if (user !== payload.user){
-            return;
-          }
-          if (currentRoomUserData[user].answers.hasOwnProperty(questionId)) {
-            return;
-          }
-          let answerPayload = {
-            answer: payload.message.answer,
-            is_correct: payload.message.is_correct,
-            value: payload.message.value,
-            time: payload.time
-          }
-          if (payload.message.is_correct) {
-            currentRoomUserData[user].points += payload.message.value
-          }
-          currentRoomUserData[user].answers[questionId] = answerPayload;
+         // check if anyone has answered before.
+        if (currentRoomUserData[user].answers.hasOwnProperty(questionId)) {
+          return;
+        }
+        if (user !== payload.user){
+          return;
+        }
+        let answerPayload = {
+          answer: payload.message.answer,
+          is_correct: payload.message.is_correct,
+          value: payload.message.value,
+          time: payload.time
+        }
+        if (payload.message.is_correct) {
+          currentRoomUserData[user].points += payload.message.value
+        }
+        currentRoomUserData[user].answers[questionId] = answerPayload;
       });
       setRoomUserData(currentRoomUserData)
     }
 
-    const handleUserJoin = (users) => {
-      if (users ===undefined){
-        console.log("users")
-        console.log(users)
+    const handleUserJoin = (payload) => {
+      if (payload !== undefined){
+        setCurrentQuestionId(payload.message.current_question)
       }
+      setInitialRoomData();
+    }
+
+    const setInitialRoomData = () => {
       let roomUserDataUrl  = `${BASE_URL}/room/${roomId}/users/`
+      // console.log(payload)
       axios.get(roomUserDataUrl)
       .then(res => {
         let currentUsers = {...roomUserData}
@@ -153,7 +188,12 @@ const RoomPage = (props) => {
       });
     }
 
-
+    const handleNewQuestion = (payload) => {
+      console.log("handleNewQuestion")
+      console.log(payload.message.question)
+      setFirstToAnswer(undefined)
+      setCurrentQuestionId(payload.message.question)
+    }
 
     return <div>
       <Room
@@ -161,7 +201,9 @@ const RoomPage = (props) => {
         roomId={roomId}
         roomUserData={roomUserData}
         sendAnswerToServer={sendAnswer}
-        currentQuestionId={144}/>
+        sendGetNewQuestion={() => sendGetNewQuestion(newQuestionId)}
+        firstToAnswer={firstToAnswer}
+        currentQuestionId={currentQuestionId}/>
     </div>
 }
 
