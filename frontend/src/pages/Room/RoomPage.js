@@ -13,8 +13,8 @@ const FIRST_TO_ANSWER_ACTION = "first_to_answer";
 const RoomPage = (props) => {
     const ws = useRef(null);
     const [roomUserData, setRoomUserData] = useState({})
-    const [currentQuestionId, setCurrentQuestionId] = useState(144)
-    const [newQuestionId, setNewQuestionId] = useState(144)
+    const [currentQuestionId, setCurrentQuestionId] = useState()
+    const [newQuestionId, setNewQuestionId] = useState()
     const [firstToAnswer, setFirstToAnswer] = useState()
     const [messages, setMessages] = useState([])
     const addNewMessage = useCallback(() => {

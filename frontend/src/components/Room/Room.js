@@ -42,7 +42,7 @@ const Room = (props) => {
     }
 
     useEffect(()=> {
-      if (roomId == "") {
+      if (roomId == "" || props.currentQuestionId === undefined) {
         return
       }
       resetRoomQuestion()
