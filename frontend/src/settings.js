@@ -1,8 +1,9 @@
 const PRODUCTION = false;
 
-const SERVER_NAME = `204.209.76.194`;
-
-const WS_BASE_URL = `ws://${SERVER_NAME}:8000/ws`;
-const BASE_URL = `http://${SERVER_NAME}:8000`;
+const SERVER_NAME = `www.nait.dev`;
+const SERVER_PORT = ``
+const WS_PROTOCOL = `ws://`
+const WS_BASE_URL = `${WS_PROTOCOL}${SERVER_NAME}${SERVER_PORT}/ws`;
+const BASE_URL = `https://${SERVER_NAME}${SERVER_PORT}`;
 
 export {BASE_URL, WS_BASE_URL};
