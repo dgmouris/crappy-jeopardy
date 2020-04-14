@@ -22,7 +22,6 @@ class QuestionConsumer(WebsocketConsumer):
         )
         self.accept()
 
-
     def disconnect(self, close_code):
         # Leave room group
         self.scope['session']['user'].delete()
