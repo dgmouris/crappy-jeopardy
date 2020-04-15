@@ -8,8 +8,8 @@ import './HomePage.css'
 
 const HomePage = (props) => {
   let history = useHistory();
-  const [roomName, setRoomName] = useState("test")
-  const [userRoomName, setUserRoomName] = useState("username")
+  const [roomName, setRoomName] = useState("")
+  const [userRoomName, setUserRoomName] = useState("")
 
   const [errors, setErrors] = useState("")
 

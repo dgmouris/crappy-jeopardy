@@ -9,6 +9,9 @@ I've done this with netlify so that we can make things a bit easier.
 2. run the build.
     npm run build
 3. deploy the build
+    - make sure you have the netlify-cli
+        npm install netlify-cli -g
+    - deploy 
     netlify deploy -d build
 
 ## deploying the backend
@@ -136,20 +139,23 @@ I've deployed this project on cybera so that we can get some stuff working for t
         sudo nano /etc/nginx/sites-available/crappy-jeopardy
     - Enter the following text where you'll change DOMAIN_OR_IP
 
-    server {
-        listen 80;
-        server_name DOMAIN_OR_IP;
 
-        location = /favicon.ico { access_log off; log_not_found off; }
-        location /static/ {
-            root /home/sammy/myprojectdir;
+        server {
+            listen 80;
+            server_name DOMAIN_OR_IP;
+
+            location = /favicon.ico { access_log off; log_not_found off; }
+            location /static/ {
+                root /home/ubuntu/crappy-jeopardy/backend;
+            }
+
+            location / {
+                include proxy_params;
+                proxy_pass http://unix:/run/gunicorn.sock;
+            }
         }
 
-        location / {
-            include proxy_params;
-            proxy_pass http://unix:/run/gunicorn.sock;
-        }
-    }
+
 
     - make a symbolic link to your configuration by using the following command
         sudo ln -s /etc/nginx/sites-available/crappy-jeopardy /etc/nginx/sites-enabled
@@ -157,4 +163,91 @@ I've deployed this project on cybera so that we can get some stuff working for t
         sudo ln -s /etc/nginx/sites-available/crappy-jeopardy /etc/nginx/sites-enabled
     - test the nginx configuration and see if there are any errors
         sudo nginx -T
-    - 
+
+13. Get some project related things done.
+    - go in to the "backend" folder
+    - run the migrations and the collect static
+        pipenv run python manage.py collectstatic
+        pipenv run migrate
+    - create a user for yourself
+        pipenv run python manage.py createsuperuser
+    - get some questions.
+        pipenv run python manage.py get_questions
+
+14. setup daphne
+    - check if daphne can run (in the backend folder)
+        pipenv run daphne -b 0.0.0.0 -p 8001 crappy_jeopardy.asgi:application
+    - create a system service file
+        sudo nano /etc/systemd/system/daphne_cf.socket
+    - write the following in there
+        [Unit]
+        Description=daphne daemon
+
+        [Service]
+        User=ubuntu
+        Group=ubuntu
+        Restart=always
+        Type=simple
+        WorkingDirectory=/home/ubuntu/crappy-jeopardy/backend
+        ExecStart=/home/ubuntu/.local/bin/pipenv run daphne \
+                  -p 8001 \
+                  -b 0.0.0.0 \
+                  crappy_jeopardy.asgi:application
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - You should be able to start daphne with the following command:
+        sudo systemctl start daphne_cj.service
+    - You should be able to check if works
+        sudo systemctl status daphne_cj.service
+
+15. modify your nginx to be able touse this.
+    - change of the following file
+        sudo nano /etc/nginx/sites-available/crappy-jeopardy
+    - so that it looks like this:
+
+
+        upstream channels-backend {
+            server localhost:8001;
+        }
+
+        server {
+            listen 80;
+            server_name DOMAIN_OR_IP;
+
+            location = /favicon.ico { access_log off; log_not_found off; }
+            location /static/ {
+                root /home/ubuntu/crappy-jeopardy/backend;
+            }
+            location / {
+                try_files $uri @proxy_to_app;
+                include proxy_params;
+                proxy_pass http://unix:/run/gunicorn.sock;
+            }
+
+            location @proxy_to_app {
+                proxy_pass http://channels-backend;
+
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+
+                proxy_redirect off;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+        }
+
+<!-- 16. Get your certs up and running
+    1. install let's encrypt certbot
+        sudo add-apt-repository ppa:certbot/certbot -y
+    2. install the certbot for nginx
+        sudo apt install python-certbot-nginx -y
+    3. 
+
+    4. Add the ssl certificate
+     sudo certbot --nginx -d 204.209.76.194
+ -->
