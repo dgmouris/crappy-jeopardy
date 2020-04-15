@@ -78,6 +78,7 @@ class QuestionConsumer(WebsocketConsumer):
         message['value'] = userAnswer.question.value
         message['first_to_answer'] = userAnswer.first_to_answer_user_name
         message['next_question'] = userAnswer.next_question.id
+        message['actual_answer'] = question.answer
 
         self.send(text_data=json.dumps({
             'user': user,
@@ -104,7 +105,6 @@ class QuestionConsumer(WebsocketConsumer):
     # websocket message handler
     def new_question(self, event):
         new_question_id = event["message"]["new_question"]
-        # self.connect(room=room)
         self.send(text_data=json.dumps({
             'user': "",
             'message': {
@@ -114,7 +114,7 @@ class QuestionConsumer(WebsocketConsumer):
             'time': datetime.datetime.now().timestamp()
         }))
 
-    def get_random_question(self,):
+    def get_random_question(self):
         new_question = Question.objects.order_by("?").first()
         return new_question
 

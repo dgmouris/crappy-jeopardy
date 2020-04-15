@@ -15,8 +15,8 @@ const Room = (props) => {
         setRoomId(props.roomId)
     }, [props.userId, props.roomId]);
 
-    const [currentQuestionText, setCurrentQuestionText] = useState("what is the capital of alberta?")
-    const [currentAnswerText, setAnswerQuestionText] = useState("edmonton")
+    const [currentQuestionText, setCurrentQuestionText] = useState("Loading...")
+    const [currentAnswerText, setCurrentAnswerQuestionText] = useState("")
 
     const [users, setUsers] = useState([]);
     const [userAnswers, setUserAnswers] = useState([]);
@@ -58,6 +58,7 @@ const Room = (props) => {
     const resetRoomQuestion = () => {
       setUserAnswers([])
       setAnswer("")
+      setCurrentAnswerQuestionText("")
       setFinalAnswer("")
     }
 
@@ -78,6 +79,10 @@ const Room = (props) => {
         return false
       }).map((user)=> {
         let userAnswer = props.roomUserData[user].answers[props.currentQuestionId]
+        // The actual answer is in the payload.
+        setCurrentAnswerQuestionText(
+          props.roomUserData[user].answers[props.currentQuestionId].actual_answer
+        );
         return {
           'name': user,
           ...userAnswer
@@ -144,7 +149,10 @@ const Room = (props) => {
         <MDBCol md="6">
           <p className="text-center mb-4">Answers</p>
           {isNotEmptyFinalAnswer() && 
-             <p className="h4 text-center mb-4">your answer: {finalAnswer}</p>
+             <React.Fragment>
+               <p className="h4 text-center mb-4">your answer: {finalAnswer}</p>
+               <p className="h4 text-center mb-4">The actual answer: {currentAnswerText}</p>
+             </React.Fragment>
           }
           {userAnswers.length !== 0 ?
               <MDBListGroup className="room-users" >
