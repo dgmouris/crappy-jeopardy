@@ -152,6 +152,7 @@ const RoomPage = (props) => {
           answer: payload.message.answer,
           is_correct: payload.message.is_correct,
           value: payload.message.value,
+          actual_answer: payload.message.actual_answer,
           time: payload.time
         }
         if (payload.message.is_correct) {
