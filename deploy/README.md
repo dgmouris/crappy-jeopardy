@@ -131,4 +131,4 @@ WantedBy=multi-user.target
     - You should be able to check if works
         sudo systemctl status daphne_cj.service
 
-
+NOTE: Right now I'm just running a development server because I'm troubleshooting some tasks. Will update this part soon. 
