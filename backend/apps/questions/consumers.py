@@ -168,8 +168,3 @@ class QuestionConsumer(WebsocketConsumer):
         for anon_user in anon_users:
             anon_users_list.append(anon_user.name)
         return anon_users_list
-
-    def remove_user(self, user):
-        return AnonymousChannelUser.objects.filter(
-            room=self.room_group_name,
-            name=user).delete()
