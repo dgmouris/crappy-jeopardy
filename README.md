@@ -81,7 +81,7 @@ INSTALLED_APPS = (
     'channels',
 )
 ```
-- To use Asgi you need first to create a `crappy_jeopardy/routing.py` file.
+- To use asgi with django channels need to create a `crappy_jeopardy/routing.py` file.
 ```python
 from channels.routing import ProtocolTypeRouter, URLRouter, ChannelNameRouter
 from channels.sessions import SessionMiddlewareStack
