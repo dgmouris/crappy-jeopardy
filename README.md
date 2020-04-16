@@ -55,9 +55,9 @@
 - I've created a management command to do this.
     1. Go in to the backend folder
     2. Start the shell
-        pipenv shell
+        `pipenv shell`
     3. Run the command
-        python manage.py get_questions
+        `python manage.py get_questions`
 
 
 ## How the project Works on the Python/Server side.
