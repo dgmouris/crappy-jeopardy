@@ -116,7 +116,7 @@ CHANNEL_LAYERS = {
 
 ### Writing the consumer which basically handles all of the messages that are sent from the react project.
 
-    - What I did below is to create a generic session that can connect and disconnect from the channel.
+- What I did below is to create a generic session that can connect and disconnect from the channel.
 
 ```python
 from asgiref.sync import async_to_sync
