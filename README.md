@@ -2,48 +2,48 @@
 
 ## Running the React Project
 - In the root folder
-npm run start --prefix frontend
+`npm run start --prefix frontend`
 - In the frontend folder
-npm run start
+`npm run start`
 
 ## Running the django project locally
 
 - Start your redis
     - Make sure redis-server is installed
-    sudo apt install redis-server
+    `sudo apt install redis-server`
     - run the server
-    sudo service redis-server start
+    `sudo service redis-server start`
     - check if the redis-server is running successfully
-    redis-cli ping
+    `redis-cli ping`
     Note: output should be PONG
 
 - Install postgres and set it up.
     - install required packages.
-        sudo apt install libpq-dev postgresql postgresql-contrib -y
+        `sudo apt install libpq-dev postgresql postgresql-contrib -y`
     - Login to postgres
-        sudo -u postgres psql
+        `sudo -u postgres psql`
     - Create database
-        CREATE DATABASE "crappy-jeopardy"
+        `CREATE DATABASE "crappy-jeopardy"`
     - Create user
-        CREATE USER crappyjeopardy WITH PASSWORD 'crappyjeopardy';
+        `CREATE USER crappyjeopardy WITH PASSWORD 'crappyjeopardy';`
     - set some options for the user
-        ALTER ROLE crappyjeopardy SET client_encoding TO 'utf8';
-        ALTER ROLE crappyjeopardy SET default_transaction_isolation TO 'read committed';
-        ALTER ROLE crappyjeopardy SET timezone TO 'UTC';
+        `ALTER ROLE crappyjeopardy SET client_encoding TO 'utf8';`
+        `ALTER ROLE crappyjeopardy SET default_transaction_isolation TO 'read committed';`
+        `ALTER ROLE crappyjeopardy SET timezone TO 'UTC';`
     - grant the privileges of the user
-        GRANT ALL PRIVILEGES ON DATABASE "crappy-jeopardy" TO crappyjeopardy;
+        `GRANT ALL PRIVILEGES ON DATABASE "crappy-jeopardy" TO crappyjeopardy;`
     - make surethat database is running correctly.
-        sudo service postgresql start
-        sudo service postgresql status
+        `sudo service postgresql start`
+        `sudo service postgresql status`
 
 - Command to Run the server
     - in the root folder
     (cd backend && pipenv run python manage.py runserver)
     - go into the backend folder
         - run the shell
-        pipenv shell
+        `pipenv shell`
         - run the server
-         python manage.py runserver
+        `python manage.py runserver`
 
 
 ## Getting New Questions
@@ -69,7 +69,7 @@ I'm going to talk shortly about how the project works on the python/server side 
 - The first step to do so is to install the packages required in the project (I've already done this but just exaplain my project)
     pipenv install channels channels_redis
 
-- In the installed apps I included my "apps.questions" which is where I create my consumers (basically you can think of this as websocket views)
+- In the installed apps I included my `apps.questions` which is where I create my consumers (basically you can think of this as websocket views)
 ```python
 INSTALLED_APPS = (
     'apps.questions',
@@ -81,7 +81,7 @@ INSTALLED_APPS = (
     'channels',
 )
 ```
-- To use Asgi you need first to create a "crappy_jeopardy/routing.py" file.
+- To use Asgi you need first to create a `crappy_jeopardy/routing.py` file.
 ```python
 from channels.routing import ProtocolTypeRouter, URLRouter, ChannelNameRouter
 from channels.sessions import SessionMiddlewareStack
@@ -93,7 +93,7 @@ application = ProtocolTypeRouter({
 ```
 Note: if you're going to use this in your project, this routing.py should be in the same folder as your settings.py file (if you're not having separate settings.)
 
-- In the "crappy_jeopardy/settings.py" you need to include "ASGI_APPLICATION" which for me looked like the following.
+- In the `crappy_jeopardy/settings.py` you need to include "ASGI_APPLICATION" which for me looked like the following.
 ```python
 ASGI_APPLICATION = 'crappy_file.routing.application'
 ```
@@ -144,9 +144,9 @@ class QuestionConsumer(WebsocketConsumer):
         )
 
 ```
-- The next part I did here is that Implemented the "receive" method which will recieve sent messages (that have a type) to the websocket.
-    - The really important piece the "async_to_sync(self.channel_layer.group_send)" method which uses the special "type" key to invoke the methods with the corresponding type names.
-        - for example if I receive a type equivalend to ANSWER_QUESTION_TYPE it will send it to the "def answer_question(self, event)" method.
+- The next part I did here is that Implemented the `receive` method which will recieve sent messages (that have a type) to the websocket.
+    - The really important piece the `sync_to_sync(self.channel_layer.group_send)` method which uses the special `type` key to invoke the methods with the corresponding type names.
+        - for example if I receive a type equivalend to ANSWER_QUESTION_TYPE it will send it to the `def answer_question(self, event)` method.
 
 
 ```python
@@ -203,7 +203,7 @@ class QuestionConsumer(WebsocketConsumer):
         pass
 ```
 
-- The websocket will send a message to all of the users using the "self.send" method, this will have an "action" and a "message" that is specific to the type of message.
+- The websocket will send a message to all of the users using the `self.send` method, this will have an `action` and a `message` that is specific to the type of message.
 
 ```python
 class QuestionConsumer(WebsocketConsumer):
@@ -227,7 +227,7 @@ class QuestionConsumer(WebsocketConsumer):
 
 ### Fix the routing in our project to point to our consumer
 
-- create a routing.py file in the "apps.questions" package.
+- create a routing.py file in the `apps.questions` package.
 ```python
 from django.urls import re_path
 
@@ -239,7 +239,7 @@ websocket_urlpatterns = [
 
 ```
 
-- Now that we have our "apps.questions.routing.py" created let's update our "crappy_jeopardy/routing.py" to use our project.
+- Now that we have our `apps.questions.routing.py` created let's update our `crappy_jeopardy/routing.py` to use our project.
 
 ```python
 from channels.routing import ProtocolTypeRouter, URLRouter, ChannelNameRouter
@@ -259,9 +259,9 @@ application = ProtocolTypeRouter({
 
 ### How do the messages work back and forth?
 
-- The frontend (so the react project) send websocket events with the "type" key to the websocket.
-- The backend send back the message with the "action" key which will decipher how messages will be parsed on the front end.
-- Then the front has handler which based on the "action" handles it differently.
+- The frontend (so the react project) send websocket events with the `type` key to the websocket.
+- The backend send back the message with the `action` key which will decipher how messages will be parsed on the front end.
+- Then the front has handler which based on the `action` handles it differently.
 - I'll probably talk on this at the exchange.js at some point.
 
 ## Next Steps
