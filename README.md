@@ -67,7 +67,7 @@ I'm going to talk shortly about how the project works on the python/server side 
 ### Installing and Integrating django channels into the project.
 
 - The first step to do so is to install the packages required in the project (I've already done this but just exaplain my project)
-    pipenv install channels channels_redis
+    `pipenv install channels channels_redis`
 
 - In the installed apps I included my `apps.questions` which is where I create my consumers (basically you can think of this as websocket views)
 ```python
