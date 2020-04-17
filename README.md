@@ -257,6 +257,21 @@ application = ProtocolTypeRouter({
 })
 ```
 
+### To Deploy with Daphne
+
+To deploy with daphne you're going to have to change the settings files to use the get_default_application of daphne rather than anything else.
+
+```python
+import os
+import django
+from channels.routing import get_default_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'crappy_jeopardy.settings')
+
+django.setup()
+application = get_default_application()
+```
+
 ### How do the messages work back and forth?
 
 - The frontend (so the react project) send websocket events with the `type` key to the websocket.
