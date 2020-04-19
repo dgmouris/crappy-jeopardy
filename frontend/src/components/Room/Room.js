@@ -128,8 +128,6 @@ const Room = (props) => {
       </MDBRow>
       <MDBRow>
         <MDBCol md="6">
-          <p className="text-center mb-4">Question</p>
-
           <MDBCard>
             <MDBCardBody className="cj_question_card">
               <MDBCardTitle >
@@ -138,18 +136,21 @@ const Room = (props) => {
                   <React.Fragment>For ${currentQuestionValue}</React.Fragment>
                 }
               </span>
-              <span className="cj_question_card_text">{currentQuestionText}</span></MDBCardTitle>
+              <span className="cj_question_card_text d-flex justify-content-center">{currentQuestionText}</span></MDBCardTitle>
             </MDBCardBody>
           </MDBCard>
-
-          <div className="text-center mt-4">
-            <MDBBtn color="green" onClick={answerHandler} disabled={finalAnswer!==""}>I know the Answer!</MDBBtn>
+          <div className="d-flex flex-row  justify-content-center">
+            <div className="text-center p-2">
+              <MDBBtn color="green" onClick={answerHandler} disabled={finalAnswer!==""}>I know the Answer!</MDBBtn>
+            </div>
+            <div className="text-center p-2">
+              <MDBBtn color="light-blue"
+                onClick={nextQuestionHandler}
+                disabled={!isFirstToAnswer()}
+                >Next Question</MDBBtn>
+            </div>
           </div>
-          <div className="text-center mt-4">
-            <MDBBtn color="light-blue"
-              onClick={nextQuestionHandler}
-              disabled={!isFirstToAnswer()}
-              >Next Question</MDBBtn>
+          <div className="d-flex flex-row  justify-content-center">
             {isFirstToAnswer() ?
               <p>Click for next quesiton!</p>
               :
@@ -162,27 +163,31 @@ const Room = (props) => {
               </React.Fragment>
             }
           </div>
-          <br/>
-          <br/>
         </MDBCol>
         <MDBCol md="6">
           <p className="text-center mb-4">Answers</p>
           {isNotEmptyFinalAnswer() &&
              <React.Fragment>
-               <p className="h4 text-center mb-4">your answer: {finalAnswer}</p>
-               <p className="h4 text-center mb-4">The actual answer: {currentAnswerText}</p>
+               <div className="d-flex flex-row">
+                 <div className="text-center p-2">your answer: {finalAnswer}</div>
+                 <div className="text-center p-2">actual answer: {currentAnswerText}</div>
+               </div>
              </React.Fragment>
           }
           {userAnswers.length !== 0 ?
               <MDBListGroup className="room-users" >
                 {userAnswers.map((user)=> {
                     return <MDBListGroupItem key={user.name}>
-                      <span>{user.name}</span>
-                      {user.is_correct?
-                        <MDBIcon className="green-text" icon="check" />
-                        :
-                        <MDBIcon className="red-text" icon="times" />
-                      }
+                      <div className="d-flex flex-row justify-content-center">
+                        <div className="text-center p-2">{user.name}</div>
+                        <div className="text-center p-2">
+                          {user.is_correct?
+                            <MDBIcon className="green-text" icon="check" />
+                            :
+                            <MDBIcon className="red-text" icon="times" />
+                          }
+                        </div>
+                      </div>
                     </MDBListGroupItem>
                 })}
               </MDBListGroup>
