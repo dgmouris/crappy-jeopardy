@@ -14,8 +14,6 @@
 
 .cj_question_card {
     background-color: $default-blue;
-
-
 }
 
 .cj_question_card_text{
@@ -24,4 +22,13 @@
     font-size: 150%;
     text-align: center;
     text-shadow: 2px 2px 10px black;
+}
+
+.cj_question_card_value {
+    display: block;
+    font-family: 'swiss-911';
+    color: $default-yellow;
+    text-shadow: 2px 2px 10px black;
+    font-size: 120%;
+    padding-bottom: 20px;
 }

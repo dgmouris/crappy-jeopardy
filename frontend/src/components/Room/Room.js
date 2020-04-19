@@ -18,6 +18,7 @@ const Room = (props) => {
 
     const [currentQuestionText, setCurrentQuestionText] = useState("Loading...")
     const [currentAnswerText, setCurrentAnswerQuestionText] = useState("")
+    const [currentQuestionValue, setCurrentQuestionValue ] = useState("");
 
     const [users, setUsers] = useState([]);
     const [userAnswers, setUserAnswers] = useState([]);
@@ -50,8 +51,12 @@ const Room = (props) => {
       let questionUrl = `${BASE_URL}/room/${roomId}/questions/${props.currentQuestionId}`
       axios.get(questionUrl)
       .then(res => {
-        let questionName = res.data.name
+        let questionName = res.data.name;
+        let value = res.data.value;
+        console.log("res.data")
+        console.log(res.data)
         setCurrentQuestionText(questionName)
+        setCurrentQuestionValue(value)
       })
 
     }, [roomId, props.currentQuestionId])
@@ -60,6 +65,7 @@ const Room = (props) => {
       setUserAnswers([])
       setAnswer("")
       setCurrentAnswerQuestionText("")
+      setCurrentQuestionValue("")
       setFinalAnswer("")
     }
 
@@ -126,7 +132,13 @@ const Room = (props) => {
 
           <MDBCard>
             <MDBCardBody className="cj_question_card">
-              <MDBCardTitle className="cj_question_card_text">{currentQuestionText}</MDBCardTitle>
+              <MDBCardTitle >
+              <span className="cj_question_card_value text-center">
+                {(currentQuestionValue !== "")&& 
+                  <React.Fragment>For ${currentQuestionValue}</React.Fragment>
+                }
+              </span>
+              <span className="cj_question_card_text">{currentQuestionText}</span></MDBCardTitle>
             </MDBCardBody>
           </MDBCard>
 
@@ -155,7 +167,7 @@ const Room = (props) => {
         </MDBCol>
         <MDBCol md="6">
           <p className="text-center mb-4">Answers</p>
-          {isNotEmptyFinalAnswer() && 
+          {isNotEmptyFinalAnswer() &&
              <React.Fragment>
                <p className="h4 text-center mb-4">your answer: {finalAnswer}</p>
                <p className="h4 text-center mb-4">The actual answer: {currentAnswerText}</p>
