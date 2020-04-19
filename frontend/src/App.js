@@ -1,6 +1,5 @@
 import React from 'react';
 import {MDBContainer, MDBRow, MDBCol } from 'mdbreact';
-import './App.css';
 import HomePage from './pages/Home/HomePage.js';
 import RoomPage from './pages/Room/RoomPage.js';
 
@@ -13,12 +12,14 @@ import {
 function App() {
   return (
     <div className="App">
-      <MDBRow>
-        <MDBCol md="12">
-          <p className="h4 text-center mb-4">Crappy Jeopardy</p>
+      <MDBRow className="cj-logo-container">
+        <MDBCol md="4"></MDBCol>
+        <MDBCol md="4">
+            <img src="/logos/cj_logo_yellow.png" className="img-fluid" alt="crappy jeopardy logo"/>
         </MDBCol>
+        <MDBCol md="4"></MDBCol>
       </MDBRow>
-      <MDBContainer>
+      <MDBContainer className="cj-view-container">
       <Router>
       <Switch>
         <Route

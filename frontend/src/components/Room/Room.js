@@ -1,10 +1,11 @@
 import React, {useEffect, useState}from 'react';
 import {MDBRow, MDBCol, MDBListGroup, MDBListGroupItem,
   MDBBtn, MDBModal, MDBModalHeader, MDBModalBody,
-  MDBModalFooter, MDBIcon} from 'mdbreact'
+  MDBModalFooter, MDBIcon, MDBCard, MDBCardBody,
+  MDBCardTitle} from 'mdbreact' 
 import axios from 'axios';
 import {BASE_URL} from '../../settings.js';
-import './Room.css'
+import './Room.scss'
 
 const Room = (props) => {
     const [userId, setUserId] = useState("")
@@ -122,7 +123,13 @@ const Room = (props) => {
       <MDBRow>
         <MDBCol md="6">
           <p className="text-center mb-4">Question</p>
-          <p className="h4 text-center mb-4">{currentQuestionText}</p>
+
+          <MDBCard>
+            <MDBCardBody className="cj_question_card">
+              <MDBCardTitle className="cj_question_card_text">{currentQuestionText}</MDBCardTitle>
+            </MDBCardBody>
+          </MDBCard>
+
           <div className="text-center mt-4">
             <MDBBtn color="green" onClick={answerHandler} disabled={finalAnswer!==""}>I know the Answer!</MDBBtn>
           </div>
@@ -168,13 +175,12 @@ const Room = (props) => {
                 })}
               </MDBListGroup>
               :
-              <p>No {isNotEmptyFinalAnswer() && <span>other</span>} answers yet</p>
+              <p className="text-center">No {isNotEmptyFinalAnswer() && <span>other</span>} answers yet</p>
           }
           <br/>
           <br/>
         </MDBCol>
       </MDBRow>
-
       <MDBRow>
         <MDBCol md="6">
           <p className="text-center mb-4">Scoreboard ({Object.keys(props.roomUserData).length} users active)</p>

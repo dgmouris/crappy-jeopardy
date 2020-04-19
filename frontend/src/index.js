@@ -1,10 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+
+// import styles and fonts
+import './fonts/korinna-bold/korinn.ttf';
+import './fonts/vni-swiss-condense/vni.common.VSWISEC.ttf';
+
+import './styles/index.scss';
 //mdbreact
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import 'bootstrap-css-only/css/bootstrap.min.css';
 import 'mdbreact/dist/css/mdb.css';
+// Korina bold (quesiton text font)
 
 import App from './App';
 import * as serviceWorker from './serviceWorker';

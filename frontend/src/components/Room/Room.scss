@@ -1,0 +1,27 @@
+@import '../../styles/fonts';
+@import '../../styles/colors';
+
+
+.room-user-list {
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+
+.room-users {
+    width: 100%;
+}
+
+.cj_question_card {
+    background-color: $default-blue;
+
+
+}
+
+.cj_question_card_text{
+    color: white!important;
+    font-family: 'korinna-bold';
+    font-size: 150%;
+    text-align: center;
+    text-shadow: 2px 2px 10px black;
+}
