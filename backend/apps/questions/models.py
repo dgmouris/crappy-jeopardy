@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 from django.utils.html import strip_tags
-    
+
 
 class AnonymousChannelUser(models.Model):
     room = models.CharField(max_length=255);
